@@ -3,28 +3,94 @@
     <!-- kanban table-->
     <div class="row">
       <div class="col-md-3">
-        <!-- <div class="card border-success mb-3" style="max-width: 18rem;"> -->
           <h5 class="card-header bg-log text-light">Back-Log</h5>
           <div class="card-body cardmain">
-            <div class="card border-success mb-3" style="max-width: 18rem;">
-              <div class="card-header bg-log text-light">Catching jelly fish</div>
+            <div class="card border-success mb-3" style="max-width: 18rem;" v-for="(task, i) in tasks" :key="i" v-if="task.status === 'log'">
+              <div class="card-header bg-log text-light">{{task.title}}</div>
               <div class="card-body">
                 <h6 class="card-title">Description:</h6>
-                <p class="card-text">description here</p>
+                <p class="card-text">{{task.description}}</p>
                 <hr>
                 <h6 class="card-title">Point:</h6>
-                <p class="card-text">100</p>
+                <p class="card-text">{{task.point}}</p>
                 <hr>
                 <h6 class="card-title">Assigned To:</h6>
-                <p class="card-text">Spongebob</p>
+                <p class="card-text">{{task.assigned}}</p>
               </div>
               <div class="card-footer bg-transparent border-success">
-                <button type="button" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                <button type="button" class="btn btn-success btn-sm"><i class="fas fa-arrow-right"></i></button>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteTask(i)"><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-success btn-sm" @click="statusAfter(i, task)"><i class="fas fa-arrow-right"></i></button>
               </div>
             </div>
           </div>
-        <!-- </div> -->
+      </div>
+      <div class="col-md-3">
+          <h5 class="card-header bg-todo text-light">To Do</h5>
+          <div class="card-body cardmain">
+            <div class="card border-success mb-3" style="max-width: 18rem;" v-for="(task, i) in tasks" :key="i" v-if="task.status === 'todo'">
+              <div class="card-header bg-todo text-light">{{task.title}}</div>
+              <div class="card-body">
+                <h6 class="card-title">Description:</h6>
+                <p class="card-text">{{task.description}}</p>
+                <hr>
+                <h6 class="card-title">Point:</h6>
+                <p class="card-text">{{task.point}}</p>
+                <hr>
+                <h6 class="card-title">Assigned To:</h6>
+                <p class="card-text">{{task.assigned}}</p>
+              </div>
+              <div class="card-footer bg-transparent border-success">
+                <button type="button" class="btn btn-warning btn-sm" @click="statusBefore(i, task)"><i class="fas fa-arrow-left"></i></button>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteTask(i)"><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-success btn-sm" @click="statusAfter(i, task)"><i class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="col-md-3">
+          <h5 class="card-header bg-doing text-light">Doing</h5>
+          <div class="card-body cardmain">
+            <div class="card border-success mb-3" style="max-width: 18rem;" v-for="(task, i) in tasks" :key="i" v-if="task.status === 'doing'">
+              <div class="card-header bg-doing text-light">{{task.title}}</div>
+              <div class="card-body">
+                <h6 class="card-title">Description:</h6>
+                <p class="card-text">{{task.description}}</p>
+                <hr>
+                <h6 class="card-title">Point:</h6>
+                <p class="card-text">{{task.point}}</p>
+                <hr>
+                <h6 class="card-title">Assigned To:</h6>
+                <p class="card-text">{{task.assigned}}</p>
+              </div>
+              <div class="card-footer bg-transparent border-success">
+                <button type="button" class="btn btn-warning btn-sm" @click="statusBefore(i, task)"><i class="fas fa-arrow-left"></i></button>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteTask(i)"><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-success btn-sm" @click="statusAfter(i, task)"><i class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="col-md-3">
+          <h5 class="card-header bg-done text-light">Done</h5>
+          <div class="card-body cardmain">
+            <div class="card border-success mb-3" style="max-width: 18rem;" v-for="(task, i) in tasks" :key="i" v-if="task.status === 'done'">
+              <div class="card-header bg-done text-light">{{task.title}}</div>
+              <div class="card-body">
+                <h6 class="card-title">Description:</h6>
+                <p class="card-text">{{task.description}}</p>
+                <hr>
+                <h6 class="card-title">Point:</h6>
+                <p class="card-text">{{task.point}}</p>
+                <hr>
+                <h6 class="card-title">Assigned To:</h6>
+                <p class="card-text">{{task.assigned}}</p>
+              </div>
+              <div class="card-footer bg-transparent border-success">
+                <button type="button" class="btn btn-warning btn-sm" @click="statusBefore(i, task)"><i class="fas fa-arrow-left"></i></button>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteTask(i)"><i class="fas fa-trash-alt"></i></button>
+              </div>
+            </div>
+          </div>
       </div>
     </div>
     <!-- Modal -->
@@ -69,7 +135,58 @@
 
 <script>
 export default {
-  name: 'Home'
+  name: 'Home',
+  data () {
+    return {
+      title: '',
+      description: '',
+      point: '',
+      assigned: ''
+    }
+  },
+  created: function () {
+    this.$store.dispatch('showTask')
+  },
+  computed: {
+    tasks: function () {
+      return this.$store.getters.showTask
+    }
+  },
+  methods: {
+    addTask: function () {
+      let input = {
+        title: this.title,
+        description: this.description,
+        point: this.point,
+        assigned: this.assigned
+      }
+      this.$store.dispatch('addTask', input).then(() => {
+        this.title = ''
+        this.description = ''
+        this.point = ''
+        this.assigned = ''
+      })
+    },
+    deleteTask: function (id) {
+      this.$store.dispatch('deleteTask', id)
+    },
+    statusAfter: function (id, data) {
+      let input = {
+        id: id,
+        data: data
+      }
+      console.log('input===', input)
+      this.$store.dispatch('statusAfter', input)
+    },
+    statusBefore: function (id, data) {
+      let input = {
+        id: id,
+        status: data.status
+      }
+      console.log('input===', input)
+      this.$store.dispatch('statusBefore', input)
+    }
+  }
 }
 </script>
 
@@ -84,16 +201,35 @@ body {
   padding-right: 10px;
   padding-left: 10px;
 }
+
 .card-title {
   font-weight: bold;
 }
+
 .card-header {
   font-weight: bolder;
-
 }
 
 .bg-log {
-  background-color: #375e97;
+  /* background-color: #375e97; */
+  background: rgba(255, 195, 18, 0.7)
 }
 
+.bg-todo {
+  /* background-color: #fb6542; */
+  background: rgba(196, 229, 56, 0.7)
+}
+
+.bg-doing {
+  background: rgba(18, 203, 196, 0.7)
+}
+
+.bg-done {
+  background: rgba(237, 76, 103, 0.7)
+}
+
+.card-body{
+  text-align: left;
+  background: rgba(white, white, white, 0.7)
+}
 </style>

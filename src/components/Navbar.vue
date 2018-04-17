@@ -21,6 +21,7 @@ nav {
   background: rgba(white, white, white, 0.5)
 }
 .navbar-brand{
-  color: white;
+  color: white !important;
+  font-weight: bold;
 }
 </style>
